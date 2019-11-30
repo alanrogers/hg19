@@ -1,0 +1,37 @@
+#!/bin/bash
+#SBATCH -J sort
+#SBATCH --account=rogersa
+#SBATCH --partition=kingspeak
+#SBATCH --time=10:00:00
+#SBATCH --nodes 1
+#SBATCH --ntasks 1
+#SBATCH -o hg19-sort.2bit
+#SBATCH -e sort.err
+
+#ensure consistent sort
+export LC_ALL=C
+
+# file names on scratch disk
+scrdir=/scratch/general/lustre/$USER/$SLURM_JOBID
+mkdir -p $scrdir
+unsorted=${scrdir}/hg19.2bit
+sorted=${scrdir}/hg19-sort.fa
+
+# copy hg19.2bit onto scratch disk for greater speed
+cp hg19.2bit $unsorted
+
+# sort chromosomes of fasta file in lexical order. Remove
+# "chr" from name of chromosome.
+seq 22 | sort | xargs printf "chr%d\n" |
+xargs -n 1 -I @ twoBitToFa -seq=@ $unsorted stdout |
+sed 's/^>chr/>/' >> $sorted
+
+# index sorted fasta
+samtools faidx $sorted
+
+# Write onto group storage, compressing the fasta file
+faToTwoBit $sorted stdout
+cp ${scrdir}/hg19-sort.fa.fai .
+
+#remove files from scratch
+rm -rf $scrdir
