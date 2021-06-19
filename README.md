@@ -1,5 +1,8 @@
 # Human reference genome, version hg19
 
+This repo doesn't contain data files; just the scripts we used to
+download and modify the data files.
+
     wget "ftp://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.2bit"
 	wget "ftp://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/md5sum.txt"
 
@@ -22,7 +25,7 @@ requires a fasta file compressed with bgzip:
 Within hg19.2bit, the chromosomes are sorted in numerical
 order. Legofit files, on the other hand, sort chromosomes in lexical
 order. One could use numerically-sorted fasta files with legofit,
-because the fast files are indexed, and bcftools could find the
+because the fasta files are indexed, and bcftools could find the
 appropriate chromosome. But this would involve a lot of seeking back
 and forth within the file. It should speed things up to sort the fasta
 files in lexical order. The job below also removes "chr" from the name
